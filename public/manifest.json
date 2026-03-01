@@ -1,0 +1,34 @@
+{
+  "name": "AllTrip — 여행 준비 도우미",
+  "short_name": "AllTrip",
+  "description": "나라·도시·달·시기 입력만으로 날씨, 옷차림, 명소·맛집을 한 번에",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0ea5e9",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "AllTrip 메인 화면"
+    }
+  ]
+}

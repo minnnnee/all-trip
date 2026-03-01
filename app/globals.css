@@ -1,0 +1,44 @@
+/* ── Pretendard 폰트 (CDN) — @import는 반드시 최상단에 ── */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    /* 모바일 최적화: 텍스트 자동 크기 조정 방지 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-slate-100 text-slate-900;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+    /* iOS 안전 영역 (노치/홈바) */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* 스크롤바 숨기기 (탭 등에서 사용) */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  /* shimmer 애니메이션 */
+  .animate-shimmer {
+    background-image: linear-gradient(
+      90deg,
+      #e2e8f0 0px,
+      #f1f5f9 40px,
+      #e2e8f0 80px
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
