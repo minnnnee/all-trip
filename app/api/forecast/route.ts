@@ -2,14 +2,24 @@
  * GET /api/forecast?lat=&lng=&days=
  *
  * Open-Meteo Forecast API (무료, API 키 불필요)
- * 최대 16일 예보 → ForecastDay[] + ClimateData(mode:'forecast') 반환
+ * 최대 16일 예보 → ForecastDay[] + ClimateData(mode:'forecast') + CurrentWeather 반환
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import type { ClimateData, ForecastDay } from '@/lib/types';
+import type { ClimateData, CurrentWeather, ForecastDay } from '@/lib/types';
 import { buildWeatherAlerts } from '@/lib/weather-utils';
 
 interface ForecastResponse {
+  timezone?: string;
+  timezone_abbreviation?: string;
+  current?: {
+    time: string;
+    temperature_2m: number;
+    precipitation_probability: number;
+    weathercode: number;
+    windspeed_10m: number;
+    is_day: number;
+  };
   daily?: {
     time: string[];
     temperature_2m_max: number[];
@@ -60,9 +70,12 @@ export async function GET(request: NextRequest) {
     const url =
       `https://api.open-meteo.com/v1/forecast` +
       `?latitude=${lat}&longitude=${lng}` +
+      // 현재 날씨 (목적지 현지 시각 기준)
+      `&current=temperature_2m,precipitation_probability,weathercode,windspeed_10m,is_day` +
+      // 일별 예보
       `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windspeed_10m_max,weathercode,snowfall_sum` +
       `&forecast_days=${days}` +
-      `&timezone=auto`;
+      `&timezone=auto`; // 목적지 현지 시간대 자동 설정
 
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error('forecast api error');
@@ -72,6 +85,19 @@ export async function GET(request: NextRequest) {
     if (!daily || !daily.time?.length) {
       throw new Error('예보 데이터 없음');
     }
+
+    // 현재 날씨 파싱
+    const currentWeather: CurrentWeather | undefined = data.current
+      ? {
+          tempNow: r1(data.current.temperature_2m),
+          weatherCode: data.current.weathercode,
+          windSpeed: r1(data.current.windspeed_10m),
+          isDay: data.current.is_day === 1,
+          time: data.current.time, // 목적지 현지 시각 'YYYY-MM-DDTHH:MM'
+          timezone: data.timezone ?? 'UTC',
+          timezoneAbbrev: data.timezone_abbreviation ?? 'UTC',
+        }
+      : undefined;
 
     const forecastDays: ForecastDay[] = daily.time.map((date, i) => ({
       date,
@@ -117,7 +143,6 @@ export async function GET(request: NextRequest) {
       windSpeed: r1(windSpeed),
       humidity,
       snowDays,
-      // 예보 모드에서는 실제 값 = 범위값 (단일 예보이므로)
       tempMinCold: r1(Math.min(...daily.temperature_2m_min)),
       tempMaxHot: r1(Math.max(...daily.temperature_2m_max)),
       tempMinTypical: r1(tempMin),
@@ -127,15 +152,14 @@ export async function GET(request: NextRequest) {
       mode: 'forecast',
       dataYears: 0,
       forecastDays,
+      currentWeather,
     };
 
     const alerts = buildWeatherAlerts(climate);
 
     return NextResponse.json(
       { climate, alerts, forecastDays },
-      {
-        headers: { 'Cache-Control': 'public, s-maxage=1800' }, // 30분 캐시
-      }
+      { headers: { 'Cache-Control': 'no-store' } } // 예보는 항상 최신 데이터
     );
   } catch (e) {
     console.error('[forecast]', e);

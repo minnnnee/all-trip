@@ -356,7 +356,12 @@ export default function Home() {
               </div>
             )}
 
-            <WeatherCard weather={result.weather} />
+            <WeatherCard
+              weather={result.weather}
+              generatedAt={result.generatedAt}
+              onRefresh={() => lastInput && handleQuickReload(lastInput.input.month, lastInput.input.period)}
+              refreshing={reloading}
+            />
             <OutfitCard outfit={result.outfit} />
 
             <div>

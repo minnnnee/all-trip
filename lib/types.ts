@@ -83,6 +83,7 @@ export interface ClimateData {
 
   // 예보 모드일 때만 존재
   forecastDays?: ForecastDay[];
+  currentWeather?: CurrentWeather;
 }
 
 export interface ForecastDay {
@@ -93,6 +94,17 @@ export interface ForecastDay {
   precipSum: number;      // mm
   weatherCode: number;    // WMO weather code
   windSpeed: number;      // km/h
+}
+
+/** 예보 모드 전용 — Open-Meteo current 섹션 */
+export interface CurrentWeather {
+  tempNow: number;          // °C 현재 기온
+  weatherCode: number;      // WMO 날씨 코드
+  windSpeed: number;        // km/h
+  isDay: boolean;
+  time: string;             // 목적지 현지 시각 'YYYY-MM-DDTHH:MM'
+  timezone: string;         // e.g. 'Asia/Tokyo'
+  timezoneAbbrev: string;   // e.g. 'JST'
 }
 
 export interface WeatherSummary {
