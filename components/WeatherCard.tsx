@@ -119,7 +119,7 @@ function TempRangeBar({
     <div className="mt-3 mb-1">
       <div className="flex justify-between text-[10px] text-white/60 mb-1.5">
         <span>추운 해 {Math.round(minCold)}°</span>
-        <span>전형적 {Math.round(minTypical)}–{Math.round(maxTypical)}°</span>
+        <span>최저 {Math.round(minTypical)}° / 최고 {Math.round(maxTypical)}°</span>
         <span>더운 해 {Math.round(maxHot)}°</span>
       </div>
       <div className="relative h-2 rounded-full bg-white/20">
@@ -236,13 +236,17 @@ export default function WeatherCard({ weather, generatedAt, onRefresh, refreshin
             )}
           </div>
         ) : (
-          /* 기후통계 모드 — 평균 + 범위 */
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-5xl font-black">{Math.round(climate.tempAvg)}°</span>
-            <div className="text-white/80 text-sm leading-tight">
-              <div>전형적 {Math.round(climate.tempMinTypical)}–{Math.round(climate.tempMaxTypical)}°</div>
-              <div>체감 {Math.round(climate.feelsLike)}°C</div>
+          /* 기후통계 모드 — 평균 + 아침/낮 범위 */
+          <div className="mt-4">
+            <div className="flex items-baseline gap-2">
+              <span className="text-5xl font-black">{Math.round(climate.tempAvg)}°</span>
+              <div className="text-white/80 text-sm leading-tight">
+                <div>체감 {Math.round(climate.feelsLike)}°C</div>
+              </div>
             </div>
+            <p className="text-white/70 text-xs mt-1.5">
+              아침 최저 {Math.round(climate.tempMinTypical)}°C · 낮 최고 {Math.round(climate.tempMaxTypical)}°C
+            </p>
           </div>
         )}
 
