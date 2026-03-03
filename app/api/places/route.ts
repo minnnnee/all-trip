@@ -87,6 +87,10 @@ function toPriceLevel(raw?: string): 1 | 2 | 3 | 4 | undefined {
 
 // ─── Google Places API 호출 ────────────────────────────────────────────────────
 
+const MIN_RATING = 4.0;   // 1차 필터 기준
+const FALLBACK_RATING = 3.5; // 결과 부족 시 완화 기준
+const RETURN_COUNT = 10;  // 최종 반환 개수
+
 async function searchPlaces(
   query: string,
   category: PlaceCategory
@@ -94,7 +98,7 @@ async function searchPlaces(
   const body = {
     textQuery: query,
     languageCode: 'ko',
-    maxResultCount: 10,
+    maxResultCount: 20, // 필터링 여유분을 위해 넉넉히 요청
   };
 
   const res = await fetch(PLACES_URL, {
@@ -117,7 +121,7 @@ async function searchPlaces(
   const data = await res.json();
   const places = (data.places ?? []) as Record<string, unknown>[];
 
-  return places.map((p, i): PlaceItem => {
+  const parsed: PlaceItem[] = places.map((p, i): PlaceItem => {
     const display = (p.displayName as { text?: string } | undefined)?.text ?? 'Unknown';
     const summary = (p.editorialSummary as { text?: string } | undefined)?.text ?? '';
     const mapsUri = typeof p.googleMapsUri === 'string' ? p.googleMapsUri : undefined;
@@ -126,7 +130,6 @@ async function searchPlaces(
     const priceLevel = toPriceLevel(typeof p.priceLevel === 'string' ? p.priceLevel : undefined);
     const primaryType = typeof p.primaryType === 'string' ? p.primaryType : '';
 
-    // photos 첫 번째 항목의 name → 이미지 URL 구성
     const photos = (p.photos as { name?: string }[] | undefined) ?? [];
     const photoUrl =
       photos.length > 0 && GOOGLE_KEY && photos[0].name
@@ -148,6 +151,19 @@ async function searchPlaces(
       isTouristFavorite: category === 'attraction' && (rating ?? 0) >= 4.5,
     };
   });
+
+  // 별점 기준 필터 + 내림차순 정렬
+  // 1차: MIN_RATING 이상, 결과가 5개 미만이면 FALLBACK_RATING으로 완화
+  const byRating = (a: PlaceItem, b: PlaceItem) => (b.rating ?? 0) - (a.rating ?? 0);
+  let filtered = parsed.filter((p) => (p.rating ?? 0) >= MIN_RATING).sort(byRating);
+  if (filtered.length < 5) {
+    filtered = parsed.filter((p) => (p.rating ?? 0) >= FALLBACK_RATING).sort(byRating);
+  }
+  if (filtered.length === 0) {
+    filtered = [...parsed].sort(byRating); // 별점 데이터 자체가 없는 경우 전체 반환
+  }
+
+  return filtered.slice(0, RETURN_COUNT);
 }
 
 // ─── 목업 데이터 (API 키 없을 때) ─────────────────────────────────────────────
