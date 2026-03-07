@@ -20,6 +20,34 @@ interface OpenMeteoGeoResult {
 }
 
 /**
+ * 한국 도시 한글명 → 영문명 매핑
+ * Open-Meteo 한국어 검색 시 동명 소도시가 먼저 반환되는 문제 우회용
+ * (예: "부산" → 전라남도 소도시, 실제 부산광역시는 "Busan" 검색 필요)
+ */
+const KOREAN_CITY_TO_EN: Record<string, string> = {
+  // 특별시 / 광역시
+  '서울': 'Seoul', '부산': 'Busan', '대구': 'Daegu', '인천': 'Incheon',
+  '광주': 'Gwangju', '대전': 'Daejeon', '울산': 'Ulsan', '세종': 'Sejong',
+  // 경기도
+  '수원': 'Suwon', '성남': 'Seongnam', '고양': 'Goyang', '용인': 'Yongin',
+  '부천': 'Bucheon', '안산': 'Ansan', '안양': 'Anyang', '평택': 'Pyeongtaek',
+  '시흥': 'Siheung', '화성': 'Hwaseong', '의정부': 'Uijeongbu', '파주': 'Paju',
+  // 강원도
+  '춘천': 'Chuncheon', '강릉': 'Gangneung', '원주': 'Wonju', '속초': 'Sokcho',
+  // 충청도
+  '청주': 'Cheongju', '충주': 'Chungju', '천안': 'Cheonan', '아산': 'Asan',
+  // 전라도
+  '전주': 'Jeonju', '익산': 'Iksan', '군산': 'Gunsan', '순천': 'Suncheon',
+  '여수': 'Yeosu', '목포': 'Mokpo',
+  // 경상도
+  '창원': 'Changwon', '포항': 'Pohang', '경주': 'Gyeongju', '구미': 'Gumi',
+  '김해': 'Gimhae', '진주': 'Jinju', '거제': 'Geoje', '통영': 'Tongyeong',
+  '안동': 'Andong',
+  // 제주
+  '제주': 'Jeju', '서귀포': 'Seogwipo',
+};
+
+/**
  * country 필드가 없는 특별 행정구/영토 — country_code → 표시명
  * Open-Meteo는 이 지역들에 country 필드를 반환하지 않음
  */
@@ -68,9 +96,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // 한국 도시 한글명 → 영문명 변환 (Open-Meteo 한국어 검색 정확도 보완)
+    const searchQuery = KOREAN_CITY_TO_EN[q] ?? q;
+
     const url =
       `https://geocoding-api.open-meteo.com/v1/search` +
-      `?name=${encodeURIComponent(q)}&count=8&language=${lang}&format=json`;
+      `?name=${encodeURIComponent(searchQuery)}&count=8&language=${lang}&format=json`;
 
     const res = await fetch(url, { next: { revalidate: 86400 } }); // 24h 캐시
     if (!res.ok) throw new Error('geocoding api error');
