@@ -105,7 +105,7 @@ const BASE_OUTFITS: Record<
     shoes: ['샌들 / 슬리퍼'],
   },
   very_hot: {
-    top: ['흡습속건 기능성 반팔', '최대한 얇고 밝은 색 소재'],
+    top: ['흡습속건 기능성 반팔', '얇은 린넨 / 면 소재 반팔'],
     bottom: ['쇼츠 / 얇은 린넨 팬츠'],
     outer: ['UV 차단 쿨링 재킷 (외출 필수)'],
     shoes: ['샌들 / 슬리퍼', '끈 조리는 No — 장거리 주의'],
@@ -198,12 +198,12 @@ function getLayeringAdvice(tempRange: number, tempBand: TempBand): string {
     return `일교차가 ${Math.round(tempRange)}°C로 큼. 탈착 가능한 아우터(가디건/경량 재킷)를 꼭 챙기세요.`;
   }
   if (tempRange >= 10) {
-    return `일교차 ${Math.round(tempRange)}°C — 낮과 밤 온도 차이 있음. 레이어 하나 여유 있게.`;
+    return `일교차 ${Math.round(tempRange)}°C — 낮과 밤 온도 차이가 있어요. 얇은 겉옷 하나 여유 있게 챙기세요.`;
   }
   if (tempBand === 'very_cold' || tempBand === 'cold') {
-    return '베이스 → 미드 → 아우터 3레이어 구성으로 보온성을 극대화하세요.';
+    return '내복 → 중간 옷 → 두꺼운 아우터 순으로 껴입어 보온성을 높이세요.';
   }
-  return '기온이 비교적 일정해 레이어링 부담이 적습니다.';
+  return '기온이 비교적 일정해 아침저녁에 두꺼운 겉옷 따로 챙길 필요 없어요.';
 }
 
 // ─── 7. 스타일 / 동행 추가 항목 ───────────────────────────────────────────────
@@ -270,7 +270,7 @@ function buildKeyPoints(
 
   const bandMessages: Record<TempBand, string> = {
     very_cold: `체감 ${feelsLike}°C 이하 — 노출 최소화, 완전 방한 필수`,
-    cold: `체감 ${feelsLike}°C — 두꺼운 아우터와 레이어링으로 보온`,
+    cold: `체감 ${feelsLike}°C — 두꺼운 아우터에 옷 껴입어 보온`,
     cool: `체감 ${feelsLike}°C — 가디건/재킷 하나면 충분`,
     mild: `체감 ${feelsLike}°C — 활동하기 가장 쾌적한 기온`,
     warm: `체감 ${feelsLike}°C — 가벼운 옷으로, 자외선 차단 시작`,
@@ -282,7 +282,7 @@ function buildKeyPoints(
   if (precipBand === 'heavy') pts.push('우기 시즌 — 방수 장비 전부 챙기기');
   else if (precipBand === 'moderate') pts.push('비 자주 옴 — 우산/방수 재킷 필수');
 
-  if (tempRange >= 15) pts.push(`일교차 ${Math.round(tempRange)}°C — 레이어링 필수`);
+  if (tempRange >= 15) pts.push(`일교차 ${Math.round(tempRange)}°C — 겉옷 탈착 필수`);
 
   return pts.slice(0, 3);
 }
@@ -311,6 +311,13 @@ export function getOutfitRecommendation(
   const outer = [...base.outer];
   const shoes = [...base.shoes];
   const accessories = [...BASE_ACCESSORIES[band]];
+
+  // 5. 최저기온 낮으면 반바지 후순위 처리
+  // warm 밴드(23-27°C)인데 아침 최저가 18°C 미만이면 반바지는 낮에만 가능
+  if (band === 'warm' && climate.tempMin < 18) {
+    const shortsIdx = bottom.findIndex((b) => b.includes('쇼츠'));
+    if (shortsIdx !== -1) bottom[shortsIdx] = '쇼츠 (낮에만, 아침저녁엔 면바지)';
+  }
 
   // 5. 강수 modifier
   const precipBand = getPrecipBand(climate.precipitation, climate.precipDays);

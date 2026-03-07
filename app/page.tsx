@@ -369,6 +369,7 @@ export default function Home() {
                 <span>🗺️</span> 추천 장소
               </h2>
               <RecommendationTabs
+                key={`${result.weather.location.name}-${result.weather.location.country}`}
                 city={result.weather.location.name}
                 country={result.weather.location.country}
                 style={lastInput?.input.style}

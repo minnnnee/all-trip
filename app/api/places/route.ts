@@ -67,8 +67,21 @@ const QUERY_TEMPLATES: Record<
     if (companion === 'family')
       return `family friendly restaurants kids menu spacious in ${city} ${country}`;
     if (companion === 'friends')
-      return `lively popular group dining restaurants bars in ${city} ${country}`;
+      return `best popular local restaurants trending with locals in ${city} ${country}`;
     return `best local restaurants popular with locals in ${city} ${country}`;
+  },
+  activity: (city, country, style, companion) => {
+    if (style === 'hiking')
+      return `hiking trekking outdoor adventure activities in ${city} ${country}`;
+    if (style === 'leisure')
+      return `water sports beach activities relaxing experiences in ${city} ${country}`;
+    if (companion === 'family')
+      return `fun family activities kids experiences amusement in ${city} ${country}`;
+    if (companion === 'couple')
+      return `romantic experiences couples activities tours in ${city} ${country}`;
+    if (companion === 'friends')
+      return `fun group activities experiences adventure tours in ${city} ${country}`;
+    return `popular local activities experiences tours things to do in ${city} ${country}`;
   },
 };
 
@@ -89,7 +102,7 @@ function toPriceLevel(raw?: string): 1 | 2 | 3 | 4 | undefined {
 
 const MIN_RATING = 4.0;   // 1차 필터 기준
 const FALLBACK_RATING = 3.5; // 결과 부족 시 완화 기준
-const RETURN_COUNT = 10;  // 최종 반환 개수
+const RETURN_COUNT = 20;  // 최종 반환 개수
 
 async function searchPlaces(
   query: string,
@@ -186,6 +199,10 @@ function getMockPlaces(city: string, category: PlaceCategory): PlaceItem[] {
     restaurant: [
       { id: 'r1', name: `${city} 로컬 맛집`, description: '현지인이 오랫동안 사랑해온 진짜 맛집', category: 'restaurant', tags: ['현지 인기', '가성비'], rating: 4.6, priceLevel: 2, isLocalFavorite: true },
       { id: 'r2', name: `${city} 파인 다이닝`, description: '미식가들이 즐겨 찾는 고급 레스토랑', category: 'restaurant', tags: ['파인다이닝', '고급'], priceLevel: 4 },
+    ],
+    activity: [
+      { id: 'ac1', name: `${city} 시티 투어`, description: '현지 가이드와 함께하는 주요 명소 투어', category: 'activity', tags: ['투어', '관광'], rating: 4.5 },
+      { id: 'ac2', name: `${city} 체험 클래스`, description: '현지 문화와 음식을 직접 체험하는 클래스', category: 'activity', tags: ['체험', '문화'], priceLevel: 2 },
     ],
   };
   return demos[category];

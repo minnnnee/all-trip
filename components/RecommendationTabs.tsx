@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Map, Star, Bookmark, ExternalLink, DollarSign } from 'lucide-react';
+import { Map, Star, Bookmark, ExternalLink, ChevronDown } from 'lucide-react';
 import type { PlaceCategory, PlaceItem, TravelStyle, Companion } from '@/lib/types';
 
 interface Props {
@@ -12,25 +12,28 @@ interface Props {
 }
 
 const TABS: { key: PlaceCategory; label: string; emoji: string; color: string }[] = [
-  { key: 'attraction', label: '명소',    emoji: '🏛️', color: 'sky' },
-  { key: 'food',       label: '음식',    emoji: '🍜', color: 'orange' },
-  { key: 'cafe',       label: '카페',    emoji: '☕', color: 'amber' },
-  { key: 'restaurant', label: '맛집',    emoji: '🍽️', color: 'rose' },
+  { key: 'attraction', label: '명소',     emoji: '🏛️', color: 'sky' },
+  { key: 'activity',   label: '액티비티', emoji: '🎯', color: 'green' },
+  { key: 'cafe',       label: '카페',     emoji: '☕', color: 'amber' },
+  { key: 'restaurant', label: '맛집',     emoji: '🍽️', color: 'rose' },
 ];
 
 const TAB_ACTIVE: Record<string, string> = {
-  sky:    'bg-sky-500 text-white border-sky-500',
-  orange: 'bg-orange-500 text-white border-orange-500',
-  amber:  'bg-amber-500 text-white border-amber-500',
-  rose:   'bg-rose-500 text-white border-rose-500',
+  sky:   'bg-sky-500 text-white border-sky-500',
+  green: 'bg-green-500 text-white border-green-500',
+  amber: 'bg-amber-500 text-white border-amber-500',
+  rose:  'bg-rose-500 text-white border-rose-500',
 };
 
 const BADGE_COLOR: Record<string, string> = {
-  sky:    'bg-sky-100 text-sky-700',
-  orange: 'bg-orange-100 text-orange-700',
-  amber:  'bg-amber-100 text-amber-700',
-  rose:   'bg-rose-100 text-rose-700',
+  sky:   'bg-sky-100 text-sky-700',
+  green: 'bg-green-100 text-green-700',
+  amber: 'bg-amber-100 text-amber-700',
+  rose:  'bg-rose-100 text-rose-700',
 };
+
+const PAGE_SIZE = 4;
+const MAX_VISIBLE = 20;
 
 // ─── 가격 레벨 표시 ───────────────────────────────────────────────────────────
 
@@ -80,7 +83,7 @@ function PlaceCard({
         />
       ) : (
         <div className="w-full h-24 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-3xl">
-          {TABS.find((t) => t.key === place.category)?.emoji}
+          {TABS.find((t) => t.key === place.category)?.emoji ?? '📍'}
         </div>
       )}
 
@@ -165,24 +168,15 @@ function Skeleton() {
 
 export default function RecommendationTabs({ city, country, style, companion }: Props) {
   const [activeTab, setActiveTab] = useState<PlaceCategory>('attraction');
-  const [places, setPlaces] = useState<Record<PlaceCategory, PlaceItem[]>>({
-    attraction: [],
-    food: [],
-    cafe: [],
-    restaurant: [],
-  });
-  const [loading, setLoading] = useState<Record<PlaceCategory, boolean>>({
-    attraction: false,
-    food: false,
-    cafe: false,
-    restaurant: false,
-  });
+  const [places, setPlaces] = useState<Partial<Record<PlaceCategory, PlaceItem[]>>>({});
+  const [loading, setLoading] = useState<Partial<Record<PlaceCategory, boolean>>>({});
+  const [visibleCount, setVisibleCount] = useState<Partial<Record<PlaceCategory, number>>>({});
   const [isMock, setIsMock] = useState(false);
   const [saved, setSaved] = useState<Set<string>>(new Set());
 
   const fetchCategory = useCallback(
     async (category: PlaceCategory) => {
-      if (places[category].length > 0 || loading[category]) return;
+      if ((places[category]?.length ?? 0) > 0 || loading[category]) return;
 
       setLoading((prev) => ({ ...prev, [category]: true }));
       try {
@@ -206,10 +200,10 @@ export default function RecommendationTabs({ city, country, style, companion }: 
     [city, country, style, companion, places, loading]
   );
 
-  // 첫 탭 자동 로드
+  // 첫 탭 자동 로드 (key prop으로 도시 변경 시 컴포넌트 리마운트됨)
   useEffect(() => {
     fetchCategory('attraction');
-  }, [city, country]); // eslint-disable-line
+  }, []); // eslint-disable-line
 
   const handleTabChange = (tab: PlaceCategory) => {
     setActiveTab(tab);
@@ -225,8 +219,18 @@ export default function RecommendationTabs({ city, country, style, companion }: 
   };
 
   const currentTab = TABS.find((t) => t.key === activeTab)!;
-  const currentPlaces = places[activeTab];
-  const isLoading = loading[activeTab];
+  const currentPlaces = places[activeTab] ?? [];
+  const isLoading = loading[activeTab] ?? false;
+  const visible = visibleCount[activeTab] ?? PAGE_SIZE;
+  const shownPlaces = currentPlaces.slice(0, visible);
+  const hasMore = currentPlaces.length > visible && visible < MAX_VISIBLE;
+
+  const showMore = () => {
+    setVisibleCount((prev) => ({
+      ...prev,
+      [activeTab]: Math.min((prev[activeTab] ?? PAGE_SIZE) + PAGE_SIZE, MAX_VISIBLE),
+    }));
+  };
 
   return (
     <div className="animate-fade-up">
@@ -262,9 +266,9 @@ export default function RecommendationTabs({ city, country, style, companion }: 
       {/* 카드 그리드 */}
       <div className="mt-3 grid grid-cols-2 gap-3">
         {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} />)
-          : currentPlaces.length > 0
-          ? currentPlaces.map((place) => (
+          ? Array.from({ length: PAGE_SIZE }).map((_, i) => <Skeleton key={i} />)
+          : shownPlaces.length > 0
+          ? shownPlaces.map((place) => (
               <PlaceCard
                 key={place.id}
                 place={place}
@@ -280,6 +284,17 @@ export default function RecommendationTabs({ city, country, style, companion }: 
             </div>
           )}
       </div>
+
+      {/* 더 보기 버튼 */}
+      {!isLoading && hasMore && (
+        <button
+          onClick={showMore}
+          className="mt-3 w-full py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+        >
+          <ChevronDown className="w-4 h-4" />
+          4개 더 보기 ({currentPlaces.length - visible}개 남음)
+        </button>
+      )}
     </div>
   );
 }

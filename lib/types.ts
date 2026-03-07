@@ -148,7 +148,7 @@ export interface OutfitRecommendation {
 
 // ─── Place Types ───────────────────────────────────────────────────────────────
 
-export type PlaceCategory = 'attraction' | 'food' | 'cafe' | 'restaurant';
+export type PlaceCategory = 'attraction' | 'food' | 'cafe' | 'restaurant' | 'activity';
 
 export interface PlaceItem {
   id: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Shirt, Footprints, Package, Info, Layers, CloudRain } from 'lucide-react';
+import { Shirt, Footprints, Package, Layers, CloudRain } from 'lucide-react';
 import type { OutfitRecommendation, TempBand } from '@/lib/types';
 
 interface Props {
@@ -61,7 +61,7 @@ export default function OutfitCard({ outfit }: Props) {
             </span>
           </div>
         </div>
-        <span className="text-3xl">👗</span>
+        <span className="text-3xl">👕</span>
       </div>
 
       {/* 핵심 포인트 */}
