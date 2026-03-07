@@ -53,7 +53,7 @@ export default function InputForm({
 
   // 도시 자동완성
   const fetchSuggestions = useCallback(async (q: string) => {
-    if (q.length < 2) { setSuggestions([]); return; }
+    if (q.trim().length < 1) { setSuggestions([]); return; }
     try {
       const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
       const data = await res.json();
