@@ -24,8 +24,12 @@ interface OpenMeteoGeoResult {
  * Open-Meteo 한국어 검색 시 동명 소도시가 먼저 반환되는 문제 우회용
  * (예: "부산" → 전라남도 소도시, 실제 부산광역시는 "Busan" 검색 필요)
  */
-const KOREAN_CITY_TO_EN: Record<string, string> = {
-  // 특별시 / 광역시
+/**
+ * 한국어 도시명 → 영문 검색어 매핑
+ * Open-Meteo 검색 정확도 보완 (한국 도시 동명 소도시 문제, 외국 도시 한글명 무결과 문제)
+ */
+const CITY_SEARCH_ALIAS: Record<string, string> = {
+  // ── 한국 특별시 / 광역시 ──────────────────────────────────────────────────
   '서울': 'Seoul', '부산': 'Busan', '대구': 'Daegu', '인천': 'Incheon',
   '광주': 'Gwangju', '대전': 'Daejeon', '울산': 'Ulsan', '세종': 'Sejong',
   // 경기도
@@ -45,6 +49,59 @@ const KOREAN_CITY_TO_EN: Record<string, string> = {
   '안동': 'Andong',
   // 제주
   '제주': 'Jeju', '서귀포': 'Seogwipo',
+
+  // ── 일본 ────────────────────────────────────────────────────────────────
+  '교토': 'Kyoto', '나고야': 'Nagoya', '고베': 'Kobe', '요코하마': 'Yokohama',
+  '나라': 'Nara', '히로시마': 'Hiroshima', '가고시마': 'Kagoshima',
+  '나가사키': 'Nagasaki', '구마모토': 'Kumamoto', '마쓰야마': 'Matsuyama',
+
+  // ── 중국 ────────────────────────────────────────────────────────────────
+  '청두': 'Chengdu', '충칭': 'Chongqing', '광저우': 'Guangzhou',
+  '선전': 'Shenzhen', '항저우': 'Hangzhou', '시안': 'Xian',
+  '쿤밍': 'Kunming', '구이린': 'Guilin', '하얼빈': 'Harbin',
+
+  // ── 동남아 ──────────────────────────────────────────────────────────────
+  '발리': 'Denpasar',       // 발리섬 수도 (Bali 검색 시 인도 도시 반환 문제)
+  '나트랑': 'Nha Trang', '달랏': 'Da Lat', '무이네': 'Mui Ne',
+  '루앙프라방': 'Luang Prabang', '비엔티안': 'Vientiane',
+  '양곤': 'Yangon', '만달레이': 'Mandalay', '바간': 'Bagan',
+  '코타키나발루': 'Kota Kinabalu', '조호르바루': 'Johor Bahru',
+  '코사무이': 'Ko Samui', '파타야': 'Pattaya', '끄라비': 'Krabi',
+  '수빅': 'Subic',
+
+  // ── 미국 ────────────────────────────────────────────────────────────────
+  'LA': 'Los Angeles', '엘에이': 'Los Angeles',
+  '하와이': 'Honolulu', '뉴올리언스': 'New Orleans',
+  '샌프란시스코': 'San Francisco', '샌디에이고': 'San Diego',
+  '마이애미': 'Miami', '시카고': 'Chicago', '보스턴': 'Boston',
+  '시애틀': 'Seattle', '덴버': 'Denver', '포틀랜드': 'Portland',
+
+  // ── 유럽 ────────────────────────────────────────────────────────────────
+  '빈': 'Vienna', '뮌헨': 'Munich', '프랑크푸르트': 'Frankfurt',
+  '취리히': 'Zurich', '제네바': 'Geneva', '브뤼셀': 'Brussels',
+  '리스본': 'Lisbon', '포르투': 'Porto', '마드리드': 'Madrid',
+  '세비야': 'Seville', '발렌시아': 'Valencia', '말라가': 'Malaga',
+  '플로렌스': 'Florence', '피렌체': 'Florence', '베네치아': 'Venice',
+  '베니스': 'Venice', '밀라노': 'Milan', '나폴리': 'Naples',
+  '아테네': 'Athens', '이스탄불': 'Istanbul', '두브로브니크': 'Dubrovnik',
+  '부다페스트': 'Budapest', '바르샤바': 'Warsaw', '크라쿠프': 'Krakow',
+  '에든버러': 'Edinburgh', '더블린': 'Dublin', '코펜하겐': 'Copenhagen',
+  '스톡홀름': 'Stockholm', '헬싱키': 'Helsinki', '오슬로': 'Oslo',
+  '레이캬비크': 'Reykjavik',
+
+  // ── 괌 / 태평양 ─────────────────────────────────────────────────────────
+  '괌': 'Guam',
+
+  // ── 중동 / 아프리카 / 기타 ───────────────────────────────────────────────
+  '아부다비': 'Abu Dhabi', '도하': 'Doha', '무스카트': 'Muscat',
+  '모로코': 'Marrakech', '마라케시': 'Marrakech', '카이로': 'Cairo',
+  '케이프타운': 'Cape Town', '나이로비': 'Nairobi',
+  '뭄바이': 'Mumbai', '뉴델리': 'New Delhi', '방갈로르': 'Bangalore',
+
+  // ── 중남미 / 오세아니아 ──────────────────────────────────────────────────
+  '리우데자네이루': 'Rio de Janeiro', '상파울루': 'São Paulo',
+  '부에노스아이레스': 'Buenos Aires', '멕시코시티': 'Mexico City',
+  '칸쿤': 'Cancun', '오클랜드': 'Auckland', '퀸스타운': 'Queenstown',
 };
 
 /**
@@ -91,14 +148,14 @@ export async function GET(request: NextRequest) {
   const q = searchParams.get('q')?.trim();
   const lang = searchParams.get('lang') ?? 'ko';
 
-  if (!q || q.length < 2) {
+  // 별칭 먼저 조회 (1글자 도시명도 허용: 빈→Vienna, 괌→Guam 등)
+  const searchQuery = CITY_SEARCH_ALIAS[q] ?? q;
+
+  if (!q || (searchQuery === q && searchQuery.length < 2)) {
     return NextResponse.json({ results: [] });
   }
 
   try {
-    // 한국 도시 한글명 → 영문명 변환 (Open-Meteo 한국어 검색 정확도 보완)
-    const searchQuery = KOREAN_CITY_TO_EN[q] ?? q;
-
     const url =
       `https://geocoding-api.open-meteo.com/v1/search` +
       `?name=${encodeURIComponent(searchQuery)}&count=8&language=${lang}&format=json`;
