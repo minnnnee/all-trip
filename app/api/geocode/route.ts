@@ -145,7 +145,7 @@ interface OpenMeteoGeoResponse {
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const q = searchParams.get('q')?.trim();
+  const q = searchParams.get('q')?.trim() ?? '';
   const lang = searchParams.get('lang') ?? 'ko';
 
   // 별칭 먼저 조회 (1글자 도시명도 허용: 빈→Vienna, 괌→Guam 등)
