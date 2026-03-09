@@ -33,7 +33,7 @@ const BADGE_COLOR: Record<string, string> = {
 };
 
 const PAGE_SIZE = 4;
-const MAX_VISIBLE = 20;
+const MAX_VISIBLE = 40;
 
 // ─── 가격 레벨 표시 ───────────────────────────────────────────────────────────
 

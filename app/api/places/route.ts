@@ -102,8 +102,8 @@ function toPriceLevel(raw?: string): 1 | 2 | 3 | 4 | undefined {
 
 const MIN_RATING = 4.0;      // 1차 필터 기준
 const FALLBACK_RATING = 3.5; // 결과 부족 시 완화 기준
-const TARGET_COUNT = 100;    // 목표 수집 개수 (페이지당 20개 × 최대 5페이지)
-const RETURN_COUNT = 100;    // 최종 반환 개수
+const TARGET_COUNT = 40;     // 목표 수집 개수 (페이지당 20개 × 최대 2페이지)
+const RETURN_COUNT = 40;     // 최종 반환 개수
 
 function parsePlaces(places: Record<string, unknown>[], category: PlaceCategory, offset = 0): PlaceItem[] {
   return places.map((p, i): PlaceItem => {
