@@ -59,6 +59,8 @@ const CITY_SEARCH_ALIAS: Record<string, string> = {
 
   // ── 중국 ────────────────────────────────────────────────────────────────
   '베이징': 'Beijing', '상하이': 'Shanghai', '우한': 'Wuhan',
+  '다롄': 'Dalian', '칭다오': 'Qingdao', '난징': 'Nanjing',
+  '샤먼': 'Xiamen', '정저우': 'Zhengzhou', '창사': 'Changsha',
   '청두': 'Chengdu', '충칭': 'Chongqing', '광저우': 'Guangzhou',
   '선전': 'Shenzhen', '항저우': 'Hangzhou', '시안': 'Xian',
   '쿤밍': 'Kunming', '구이린': 'Guilin', '하얼빈': 'Harbin',
