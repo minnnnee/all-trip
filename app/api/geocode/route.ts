@@ -51,25 +51,46 @@ const CITY_SEARCH_ALIAS: Record<string, string> = {
   '제주': 'Jeju', '서귀포': 'Seogwipo',
 
   // ── 일본 ────────────────────────────────────────────────────────────────
+  '도쿄': 'Tokyo', '오사카': 'Osaka', '삿포로': 'Sapporo',
+  '후쿠오카': 'Fukuoka', '오키나와': 'Naha', '나하': 'Naha', '센다이': 'Sendai',
   '교토': 'Kyoto', '나고야': 'Nagoya', '고베': 'Kobe', '요코하마': 'Yokohama',
   '나라': 'Nara', '히로시마': 'Hiroshima', '가고시마': 'Kagoshima',
   '나가사키': 'Nagasaki', '구마모토': 'Kumamoto', '마쓰야마': 'Matsuyama',
 
   // ── 중국 ────────────────────────────────────────────────────────────────
+  '베이징': 'Beijing', '상하이': 'Shanghai', '우한': 'Wuhan',
   '청두': 'Chengdu', '충칭': 'Chongqing', '광저우': 'Guangzhou',
   '선전': 'Shenzhen', '항저우': 'Hangzhou', '시안': 'Xian',
   '쿤밍': 'Kunming', '구이린': 'Guilin', '하얼빈': 'Harbin',
 
+  // ── 대만 ────────────────────────────────────────────────────────────────
+  '타이베이': 'Taipei', '타이페이': 'Taipei', '가오슝': 'Kaohsiung',
+  '타이중': 'Taichung', '타이난': 'Tainan',
+
   // ── 동남아 ──────────────────────────────────────────────────────────────
-  '발리': 'Denpasar',       // 발리섬 수도 (Bali 검색 시 인도 도시 반환 문제)
-  '나트랑': 'Nha Trang', '달랏': 'Da Lat', '무이네': 'Mui Ne',
+  // 태국
+  '방콕': 'Bangkok', '치앙마이': 'Chiang Mai', '푸켓': 'Phuket', '푸껫': 'Phuket',
+  '코사무이': 'Ko Samui', '파타야': 'Pattaya', '끄라비': 'Krabi',
+  // 베트남
+  '호치민': 'Ho Chi Minh City', '하노이': 'Hanoi', '다낭': 'Da Nang',
+  '호이안': 'Hoi An', '나트랑': 'Nha Trang', '달랏': 'Da Lat', '무이네': 'Mui Ne',
+  // 필리핀
+  '마닐라': 'Manila', '세부': 'Cebu', '보라카이': 'Boracay',
+  '팔라완': 'Puerto Princesa', '보홀': 'Tagbilaran', '다바오': 'Davao',
+  '수빅': 'Subic',
+  // 싱가포르 / 말레이시아 / 인도네시아
+  '싱가포르': 'Singapore',
+  '쿠알라룸푸르': 'Kuala Lumpur', '조호르바루': 'Johor Bahru',
+  '코타키나발루': 'Kota Kinabalu', '랑카위': 'Langkawi', '페낭': 'Penang',
+  '발리': 'Denpasar', '자카르타': 'Jakarta', '롬복': 'Mataram',
+  // 캄보디아 / 라오스 / 미얀마
+  '씨엠립': 'Siem Reap', '프놈펜': 'Phnom Penh',
   '루앙프라방': 'Luang Prabang', '비엔티안': 'Vientiane',
   '양곤': 'Yangon', '만달레이': 'Mandalay', '바간': 'Bagan',
-  '코타키나발루': 'Kota Kinabalu', '조호르바루': 'Johor Bahru',
-  '코사무이': 'Ko Samui', '파타야': 'Pattaya', '끄라비': 'Krabi',
-  '수빅': 'Subic',
 
   // ── 미국 ────────────────────────────────────────────────────────────────
+  '뉴욕': 'New York', '라스베가스': 'Las Vegas', '올랜도': 'Orlando',
+  '워싱턴': 'Washington', '애틀랜타': 'Atlanta', '피닉스': 'Phoenix',
   'LA': 'Los Angeles', '엘에이': 'Los Angeles',
   '하와이': 'Honolulu', '뉴올리언스': 'New Orleans',
   '샌프란시스코': 'San Francisco', '샌디에이고': 'San Diego',
@@ -77,6 +98,9 @@ const CITY_SEARCH_ALIAS: Record<string, string> = {
   '시애틀': 'Seattle', '덴버': 'Denver', '포틀랜드': 'Portland',
 
   // ── 유럽 ────────────────────────────────────────────────────────────────
+  '런던': 'London', '파리': 'Paris', '로마': 'Rome',
+  '암스테르담': 'Amsterdam', '베를린': 'Berlin', '바르셀로나': 'Barcelona',
+  '프라하': 'Prague', '니스': 'Nice', '모나코': 'Monaco',
   '빈': 'Vienna', '뮌헨': 'Munich', '프랑크푸르트': 'Frankfurt',
   '취리히': 'Zurich', '제네바': 'Geneva', '브뤼셀': 'Brussels',
   '리스본': 'Lisbon', '포르투': 'Porto', '마드리드': 'Madrid',
@@ -90,18 +114,24 @@ const CITY_SEARCH_ALIAS: Record<string, string> = {
   '레이캬비크': 'Reykjavik',
 
   // ── 괌 / 태평양 ─────────────────────────────────────────────────────────
-  '괌': 'Guam',
+  '괌': 'Guam', '사이판': 'Saipan',
 
   // ── 중동 / 아프리카 / 기타 ───────────────────────────────────────────────
-  '아부다비': 'Abu Dhabi', '도하': 'Doha', '무스카트': 'Muscat',
+  '두바이': 'Dubai', '아부다비': 'Abu Dhabi', '도하': 'Doha', '무스카트': 'Muscat',
+  '텔아비브': 'Tel Aviv', '암만': 'Amman',
   '모로코': 'Marrakech', '마라케시': 'Marrakech', '카이로': 'Cairo',
   '케이프타운': 'Cape Town', '나이로비': 'Nairobi',
   '뭄바이': 'Mumbai', '뉴델리': 'New Delhi', '방갈로르': 'Bangalore',
 
-  // ── 중남미 / 오세아니아 ──────────────────────────────────────────────────
+  // ── 오세아니아 ──────────────────────────────────────────────────────────
+  '시드니': 'Sydney', '멜버른': 'Melbourne', '브리즈번': 'Brisbane',
+  '골드코스트': 'Gold Coast', '케언즈': 'Cairns',
+  '오클랜드': 'Auckland', '퀸스타운': 'Queenstown', '크라이스트처치': 'Christchurch',
+
+  // ── 중남미 ──────────────────────────────────────────────────────────────
   '리우데자네이루': 'Rio de Janeiro', '상파울루': 'São Paulo',
   '부에노스아이레스': 'Buenos Aires', '멕시코시티': 'Mexico City',
-  '칸쿤': 'Cancun', '오클랜드': 'Auckland', '퀸스타운': 'Queenstown',
+  '칸쿤': 'Cancun',
 };
 
 /**
