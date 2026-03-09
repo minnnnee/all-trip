@@ -1,10 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { Shirt, Footprints, Package, Layers, CloudRain } from 'lucide-react';
 import type { OutfitRecommendation, TempBand } from '@/lib/types';
+import { submitOutfitFeedback } from '@/lib/supabase';
 
 interface Props {
   outfit: OutfitRecommendation;
+  city: string;
+  country: string;
+  month: number;
+  period: string;
 }
 
 // ─── 밴드별 컬러 테마 ─────────────────────────────────────────────────────────
@@ -45,8 +51,14 @@ function Section({ icon, label, items, accent = 'text-slate-700' }: SectionProps
   );
 }
 
-export default function OutfitCard({ outfit }: Props) {
+export default function OutfitCard({ outfit, city, country, month, period }: Props) {
   const theme = BAND_THEME[outfit.band];
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const handleFeedback = async (label: string, value: 'cold' | 'ok' | 'hot') => {
+    setSelected(label);
+    await submitOutfitFeedback({ city, country, month, period, tempBand: outfit.band, tempDisplay: outfit.tempDisplay, feedback: value });
+  };
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-md animate-fade-up">
@@ -136,16 +148,28 @@ export default function OutfitCard({ outfit }: Props) {
 
       {/* 피드백 버튼 */}
       <div className="bg-white px-4 py-3 border-t border-slate-100 flex items-center gap-2">
-        <span className="text-xs text-slate-400">이 추천이 도움됐나요?</span>
+        <span className="text-xs text-slate-400">
+          {selected ? '피드백 감사해요!' : '이 추천이 도움됐나요?'}
+        </span>
         <div className="flex gap-2 ml-auto">
-          {['😰 추웠음', '👍 적당', '🥵 더웠음'].map((label) => (
-            <button
-              key={label}
-              className="text-xs px-2.5 py-1 rounded-full border border-slate-200 hover:border-sky-300 hover:bg-sky-50 transition-colors text-slate-600"
-            >
-              {label}
-            </button>
-          ))}
+          {(['😰 추웠음', '👍 적당', '🥵 더웠음'] as const).map((label) => {
+            const value = label.includes('추') ? 'cold' : label.includes('적') ? 'ok' : 'hot';
+            const isSelected = selected === label;
+            return (
+              <button
+                key={label}
+                disabled={!!selected}
+                onClick={() => handleFeedback(label, value as 'cold' | 'ok' | 'hot')}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  isSelected
+                    ? 'bg-sky-500 text-white border-sky-500'
+                    : 'border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-600 disabled:opacity-40'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -362,7 +362,13 @@ export default function Home() {
               onRefresh={() => lastInput && handleQuickReload(lastInput.input.month, lastInput.input.period)}
               refreshing={reloading}
             />
-            <OutfitCard outfit={result.outfit} />
+            <OutfitCard
+              outfit={result.outfit}
+              city={result.weather.location.name}
+              country={result.weather.location.country}
+              month={result.weather.month}
+              period={result.weather.period}
+            />
 
             <div>
               <h2 className="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-1.5">
