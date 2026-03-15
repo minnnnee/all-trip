@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://all-trip-alpha.vercel.app/sitemap.xml
