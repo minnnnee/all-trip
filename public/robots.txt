@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://all-trip-alpha.vercel.app/sitemap.xml
+Sitemap: https://all-trip-hltg.vercel.app/sitemap.xml
