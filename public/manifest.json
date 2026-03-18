@@ -1,6 +1,6 @@
 {
-  "name": "TripCast — 여행 준비 도우미",
-  "short_name": "TripCast",
+  "name": "Tripwise — 여행 준비 도우미",
+  "short_name": "Tripwise",
   "description": "나라·도시·달·시기 입력만으로 날씨, 옷차림, 명소·맛집을 한 번에",
   "start_url": "/",
   "display": "standalone",
@@ -28,7 +28,7 @@
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "TripCast 메인 화면"
+      "label": "Tripwise 메인 화면"
     }
   ]
 }
