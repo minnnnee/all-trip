@@ -190,24 +190,36 @@ export default function InputForm({
         <label className="block text-sm font-medium text-slate-600 mb-1.5">
           출발일 <span className="text-slate-400 font-normal">(선택 — 14일 이내 시 실시간 예보)</span>
         </label>
-        <div className="relative">
-          <input
-            type="date"
-            value={departureDate}
-            onChange={(e) => setDepartureDate(e.target.value)}
-            min={new Date().toISOString().slice(0, 10)}
-            className="w-full pl-3 pr-9 py-3 rounded-xl border border-slate-200 bg-white text-slate-800
-                       focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all text-sm"
-          />
-          {departureDate && (
-            <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold px-1.5 py-0.5 rounded-md ${
-              isForecastMode
-                ? 'bg-emerald-100 text-emerald-600'
-                : 'bg-slate-100 text-slate-500'
-            }`}>
-              {isForecastMode ? `🟢 D-${forecastDays} 예보` : `📊 기후통계`}
-            </span>
-          )}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
+              type="date"
+              value={departureDate}
+              onChange={(e) => setDepartureDate(e.target.value)}
+              min={new Date().toISOString().slice(0, 10)}
+              className="w-full pl-3 pr-3 py-3 rounded-xl border border-slate-200 bg-white text-slate-800
+                         focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition-all text-sm"
+            />
+          </div>
+          {departureDate ? (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-md ${
+                isForecastMode
+                  ? 'bg-emerald-100 text-emerald-600'
+                  : 'bg-slate-100 text-slate-500'
+              }`}>
+                {isForecastMode ? `🟢 D-${forecastDays} 예보` : `📊 기후통계`}
+              </span>
+              <button
+                type="button"
+                onClick={() => setDepartureDate('')}
+                className="w-7 h-7 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors text-base leading-none"
+                aria-label="출발일 초기화"
+              >
+                ×
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
 
