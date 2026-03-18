@@ -224,9 +224,9 @@ export default function Home() {
   const handleShare = async () => {
     if (!result) return;
     const { location, month, period } = result.weather;
-    const text = `${location.name}, ${location.country} ${MONTH_LABEL[month]} ${PL[period]} 여행 정보 — AllTrip`;
+    const text = `${location.name}, ${location.country} ${MONTH_LABEL[month]} ${PL[period]} 여행 정보 — TripCast`;
     if (navigator.share) {
-      await navigator.share({ title: 'AllTrip', text, url: window.location.href }).catch(() => {});
+      await navigator.share({ title: 'TripCast', text, url: window.location.href }).catch(() => {});
     } else {
       await navigator.clipboard.writeText(text).catch(() => {});
     }
@@ -248,7 +248,7 @@ export default function Home() {
 
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <Plane className="w-5 h-5 text-sky-500 shrink-0" />
-          <span className="font-bold text-slate-800 text-base shrink-0">AllTrip</span>
+          <span className="font-bold text-slate-800 text-base shrink-0">TripCast</span>
           {result && (
             <span className="text-xs text-slate-400 font-normal truncate">
               — {result.weather.location.name} {MONTH_LABEL[result.weather.month]}{PL[result.weather.period]}
