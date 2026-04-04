@@ -396,7 +396,9 @@ export default function Home() {
         )}
       </main>
 
-      <div className="h-4" />
+      <footer className="text-center py-4 text-xs text-slate-400">
+        © {new Date().getFullYear()} minnneee. All rights reserved.
+      </footer>
     </div>
   );
 }
